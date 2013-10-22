@@ -1,0 +1,12 @@
+/home/dobek/code/bin
+/home/dobek/Dropbox
+/home/dobek/Pictures
+/home/dobek/Desktop
+/home/dobek/Documents/Books
+/home/dobek/.ssh
+/home/dobek/.Skype
+/home/dobek/.bashrc
+/home/dobek/.directfbrc
+/home/dobek/.gitconfig
+/home/dobek/.vimrc
+/home/dobek/.config/backintime
