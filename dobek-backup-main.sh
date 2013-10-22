@@ -2,19 +2,10 @@
 
 echo $0 Started
 
-local RSYNC_SERVER=xxxxx.com
-local RSYNC_PASSWORD=xxxxxx
+ETC="$(dirname $(readlink -f $0))/etc"
+source ${ETC}/continuous-backup.cfg
+source ${ETC}/server-password
 
-
-LOG_DIR=/var/log/dobek-backup
-LOG_COMPLETED=$LOG_DIR/completed.log
-LOG_STARTED=$LOG_DIR/started.log
-LOG_LOG=/dev/null
-
-DIR="$(dirname $(readlink -f $0))"
-DIR_LIST=$DIR/dirlist.txt
-IGNORE=$DIR/ignore.txt
-HOTLIST=/tmp/dobek-backup-just-modified.tmp
 
 log_header() {
 	echo --------------------------------------------------------------------------- #>> $LOG
