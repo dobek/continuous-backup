@@ -3,7 +3,7 @@
 echo $0 Started
 
 ROOT=""
-ROOT="/home/dobek/code/prv/continuous-backup"
+# ROOT="/home/dobek/code/prv/continuous-backup"
 # set -x
 
 ETC="${ROOT}/etc/continuous-backup"
@@ -33,17 +33,19 @@ debug() {
 
 mkdir -p ${LOG_DIR}
 if [ ! -f ${LOG_STARTED} ]; then
-	echo "none" > ${LOG_STARTED}
+	date +"%Y%m%d-%H%M%S" > ${LOG_STARTED}
 fi
 if [ ! -f ${LOG_COMPLETED} ]; then
 	echo "none" > ${LOG_COMPLETED}
 fi
 if [ ! -f ${LOG_UPLOADED} ]; then
-	echo "201301010000" > ${LOG_UPLOADED}
+	echo "201307010000" > ${LOG_UPLOADED}
 fi
 
 while true ; do
 
+	debug 1
+	sleep ${DONE_SLEEP} ; sleep 1m
 	debug 2
 	COMPLETED=`cat $LOG_COMPLETED`
 	STARTED=`cat $LOG_STARTED`
@@ -69,9 +71,8 @@ while true ; do
 				/etc   \
 				--exclude-from=$IGNORE   \
 				--bwlimit=${BWLIMIT} \
-				--delete-delay \
 				--password-file=${PASSWORD} \
-				/  \
+				/etc  \
 				rsync://${RSYNC_SERVER}/BackInTime/$STARTED/"
 			log EXECUTE: $COMMAND
 			$COMMAND >> $LOG_LOG 2>&1
@@ -82,7 +83,7 @@ while true ; do
 			touch -t ${UPLOADED} ${TIMEFROM}
 			find `cat $DIR_LIST` -newer ${TIMEFROM} -mount > $HOTLIST
 			debug 5.2
-			LAST_RSYNC=`date +"%Y%m%d-%H%M%S"`
+			LAST_RSYNC=`date +"%Y%m%d%H%M"`
 			COMMAND="rsync -azvt  \
 				--files-from=$HOTLIST   \
 				--exclude-from=$IGNORE   \
@@ -97,7 +98,7 @@ while true ; do
 
 		# fi
 		log FAILED - will try in ${RETRY_SLEEP}
-		sleep ${RETRY_SLEEP}
+		sleep ${RETRY_SLEEP} ; sleep 1m
 		debug 6
 	done
 
@@ -106,8 +107,6 @@ while true ; do
 	echo $STARTED > $LOG_COMPLETED
 	echo ${LAST_RSYNC} > $LOG_UPLOADED
 	log DONE
-	sleep ${DONE_SLEEP}
-	debug 8
 
 done
 

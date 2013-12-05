@@ -1,0 +1,52 @@
+#!/sbin/runscript
+
+checkconfig()
+{
+  if [ ! -f /etc/continuous-backup/continuous-backup.cfg ] ; then
+    eerror "/etc/continuous-backup/continuous-backup.cfg does not exists."
+    return 1
+  fi
+
+  if [ -z "${DEMON}" ] \
+  	|| [ -z "${PID}" ] \
+  	|| [ -z "${IONICE}" ] \
+    || [ -z "${NICE}" ] \
+  	|| [ -z "${LOG_DEAMON}" ]
+  then
+    eerror "You must set config options in /etc/continuous-backup/continuous-backup.cfg first"
+    return 1
+  fi
+
+  if [ ! -f ${DEMON} ] ; then
+    eerror "Script ${DEMON} does not exists."
+    return 1
+  fi
+}
+
+start()
+{
+  ebegin "Starting Continuous-Backup Demon"
+  checkconfig || return 1
+  mkdir -p ${LOG_DIR}
+  echo `date`: Starting...  >> ${LOG_DEAMON}
+  start-stop-daemon --start \
+    --exec ${DEMON} \
+    --pidfile ${PID} \
+    --background \
+    --make-pidfile \
+    --ionice ${IONICE} \
+    --nice ${NICE} \
+    --stdout ${LOG_DEAMON} \
+    --stderr ${LOG_DEAMON}
+  eend $?
+}
+
+stop()
+{
+  ebegin "Stopping Continuous-Backup Demon"
+  start-stop-daemon --stop \
+    --exec ${DEMON} \
+    --pidfile ${PID}
+  eend $retval
+  echo `date`: Stopped  >> ${LOG_DEAMON}
+}
